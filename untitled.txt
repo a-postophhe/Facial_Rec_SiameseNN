@@ -1,0 +1,134 @@
+STEPS:
+
+part 1: 
+
+1. install dependencies
+2. import tensorflow layers
+3. setup gpu growth
+4. create data folders
+
+use tensorflow FUNCTIONAL APIS (more flexible)
+
+we'll use siamese neural network
+
+we'll use models.Model which can build more sphisticated nn than sequential api
+
+create 3 folders:
+
+anchor: pass input image
+
+and
+
+verification images:
+positive image: verify to be same
+negative image: verify to be diff
+
+setup paths first and then use os library to go and create those directories
+
+
+part 2:
+
+collect negative images by leveraging standard image repo: labelled faces in the wild
+collect anchor images
+collect positive images: our image using webcam(by openv) or upload any picture
+
+for eg: 
+the webcam data will be anchor(encoding model) and a distant layer examinesthat anchor and positive images are same
+&
+the same encoding model is used and the distant layer examines that the anchor and negative image aint the same
+
+
+anchor and positive images are coming from webcam using opencv using cv2.videocapture 
+
+
+the lfw images are of size 250  x 250 so we gotta change our webcam images to this size
+
+next step is to save the images:
+
+using same code as for quitting we can pass different keys for collecting positive and anchor images
+
+[ understanding cv2.waitKey(1) & 0XFF == ord('a') :
+
+If user press, for example, q then waitKey return DECIMAL VALUE of q is 113. In Binary, It is expressed as 0b01110001.
+Next, AND operator is excuted with two inputs are 0b01110001 and 0xFF (0b11111111).
+0b01110001 AND 0b11111111 = 0b01110001. Exactly result is DECIMAL VALUE of q
+
+Second, compare value of left expression 0b01110001 with ord('q'). Clearly, these values is the same as another value. And final result is break is invoked.
+
+]
+
+we will import uuid library to generate unique image names
+
+
+part 3:
+
+ get image directories and preprocess images- scale and resize
+ create positive and negative samples- labelled dataset
+ load data into tf dataloader and build train and test partition
+ 
+The tf.data API enables you to build complex input pipelines from simple, reusable pieces. For example, the pipeline for an image model might aggregate data from files in a distributed file system, apply random perturbations to each image, and merge randomly selected images into a batch for training.
+ 
+
+
+part 4:
+
+build embedding layer: converts raw image to data representation of the image
+
+build l1 distance layer: compares anchor and the other pipeline to verify if they are similar or not, think of them as two streams running simultaneously
+We'll actually be subtracting them
+
+the distance layer should take the output of the embedding layer as input (the 4096 feature vectors) and output a value out of this, we'll the pass that to a fully connected layer and output the final result 
+
+
+compile the siamese neural network
+
+
+part 5:
+
+set up loss function (binary crossentropy)
+
+set up optimizer: for back propagation (adam)
+
+establish checkpoints: to reload if something messes up
+
+build custom training step: defines what happens when we train on a single batch
+
+// so we use our model and pass through some data to get a prediction through the training step, then we calculate the loss using binary crossentropy; we then calculate the gradients for all of our weights across the network and use optimizer to back propagate throghout the network to minimize the loss - to ideally get the BEST POSSIBLE MODEL(defining learning rate)
+
+create training loop: aplying training set at every single epoch
+
+train the model
+
+
+part 6: 
+
+test the model
+
+evaluate performance
+
+save model for deployment
+
+
+part 7:
+
+setup verification images
+
+build verify function
+
+perform recognition in real time
+
+
+to perform verification: in one verification ccle we're gonna include 50 predictions (comparisons with positive images) for better results
+
+
+set up detection threshold: 50 %
+set up verification threshold: we can set it to be 30/50 which would mean 30 images of 50 should pass detection threshold to be true
+
+ 
+i've created two folders namely verification_iamges and input_image and i'll be moving some images from positive folder to the the verification_images folder.
+
+the live image captured is to be saved in the input_image folder.
+
+
+
+
